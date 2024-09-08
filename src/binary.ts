@@ -17,5 +17,7 @@ export function getBinaryFilePath(): string {
 
     if (!fs.existsSync(binaryPath)) throw new Error(`Binary not found ${binaryName} for platform ${platform} and architecture ${arch}`);
 
+    if (platform !== 'win32') fs.chmodSync(binaryPath, 0o755);
+
     return binaryPath;
 }

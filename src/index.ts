@@ -1,6 +1,7 @@
 import { exec } from 'child_process';
 import { getBinaryFilePath } from './binary';
 
+const BINARY_PATH = getBinaryFilePath();
 /**
  * Options for the minify function
  */
@@ -107,7 +108,7 @@ export function minify(options: MinifyOptions): Promise<string> {
         args.push(...options.inputs);
     }
 
-    const command = `${getBinaryFilePath()} ${args.join(' ')}`;
+    const command = `${BINARY_PATH} ${args.join(' ')}`;
 
     return new Promise((resolve, reject) => {
         const childProcess = exec(command, (error, stdout) => {

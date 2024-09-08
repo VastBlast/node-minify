@@ -1,17 +1,17 @@
-# @VastBlast/node-minify
+# @vastblast/node-minify
 
 A Node.js wrapper for the [minify](https://github.com/tdewolff/minify/) command-line tool by tdewolff. This package provides a simple and type-safe way to use the minify tool in your Node.js projects.
 
 ## Installation
 
 ```bash
-npm install @VastBlast/node-minify
+npm install @vastblast/node-minify
 ```
 
 ## Usage
 
 ```typescript
-import { minify } from '@VastBlast/node-minify';
+import { minify } from '@vastblast/node-minify';
 
 async function example() {
   try {
