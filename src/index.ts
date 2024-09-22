@@ -108,7 +108,7 @@ export function minify(options: MinifyOptions): Promise<string> {
         args.push(...options.inputs);
     }
 
-    const command = `${BINARY_PATH} ${args.join(' ')}`;
+    const command = `"${BINARY_PATH}" ${args.join(' ')}`;
 
     return new Promise((resolve, reject) => {
         const childProcess = exec(command, (error, stdout) => {
