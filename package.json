@@ -12,5 +12,8 @@
   "license": "ISC",
   "devDependencies": {
     "typescript": "^5.6.2"
+  },
+  "dependencies": {
+    "@vastblast/node-minify": "file:"
   }
 }
