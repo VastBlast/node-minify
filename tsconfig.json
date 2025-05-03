@@ -30,9 +30,10 @@
       "skipLibCheck": true
     },
     "include": [
-      "src/**/*"
+      "src/**/*.ts"
     ],
     "exclude": [
+      "dist",
       "node_modules",
       "**/*.spec.ts"
     ]

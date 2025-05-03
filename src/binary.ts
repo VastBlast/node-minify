@@ -13,7 +13,7 @@ export function getBinaryFilePath(): string {
 
     let binaryName = `minify-${platform}-${arch}`;
     if (platform === 'win32') binaryName += '.exe';
-    const binaryPath = path.join(__dirname, '..', 'binaries', binaryName);
+    const binaryPath = path.join(__dirname, '..', 'bin', binaryName);
 
     if (!fs.existsSync(binaryPath)) throw new Error(`Binary not found ${binaryName} for platform ${platform} and architecture ${arch}`);
 
