@@ -2,10 +2,11 @@ import { exec } from 'child_process';
 import { getBinaryFilePath } from './binary';
 
 const BINARY_PATH = getBinaryFilePath();
+
 /**
  * Options for the minify function
  */
-interface MinifyOptions {
+export interface MinifyOptions {
     /** Minify all files, including hidden files and files in hidden directories */
     all?: boolean;
     /** Bundle files by concatenation into a single file */

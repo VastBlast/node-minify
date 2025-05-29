@@ -1,6 +1,6 @@
 {
   "name": "@vastblast/node-minify",
-  "version": "1.2.23.6",
+  "version": "1.2.23.61",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
