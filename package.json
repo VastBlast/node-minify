@@ -1,6 +1,6 @@
 {
   "name": "@vastblast/node-minify",
-  "version": "1.2.23.61",
+  "version": "1.2.24.3",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^22.15.17",
+    "@types/node": "^24.5.2",
     "@types/tar": "^6.1.13",
     "@types/yauzl-promise": "^4.0.1",
     "adm-zip": "^0.5.16",

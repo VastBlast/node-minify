@@ -30,7 +30,7 @@ function detectPlatformFolder(): string {
         folders = filterNoEmpty(folders, x => x.includes('amd64'));
         folders = filterNoEmpty(folders, x => x.includes('x86_64'));
         folders = filterNoEmpty(folders, x => x.includes('64'));
-    } else if (arch == 'x32') {
+    } else if (arch == 'ia32') {
         folders = filterNoEmpty(folders, x => x.includes('386'));
         folders = filterNoEmpty(folders, x => x.includes('x86'));
         folders = filterNoEmpty(folders, x => x.includes('32'));
