@@ -7,16 +7,8 @@ const BINARY_PATH = getBinaryFilePath();
  * Options for the minify function
  */
 export interface MinifyOptions {
-    /** Minify all files, including hidden files and files in hidden directories */
-    all?: boolean;
-    /** Bundle files by concatenation into a single file */
-    bundle?: boolean;
     /** Number of significant digits to preserve in numbers, 0 is all */
     cssPrecision?: number;
-    /** Path exclusion pattern, excludes paths from being processed */
-    exclude?: string[];
-    /** Filename extension mapping to filetype (eg. css or text/css) */
-    ext?: Record<string, string>;
     /** Preserve all comments in HTML */
     htmlKeepComments?: boolean;
     /** Preserve all IE conditional comments (DEPRECATED) */
@@ -45,40 +37,16 @@ export interface MinifyOptions {
     jsonKeepNumbers?: boolean;
     /** Number of significant digits to preserve in numbers, 0 is all in JSON */
     jsonPrecision?: number;
-    /** List all accepted filetypes */
-    list?: boolean;
-    /** Filename matching pattern, only matching filenames are processed */
-    match?: string[];
-    /** Mimetype (eg. text/css), optional for input filenames (DEPRECATED, use type) */
-    mime?: string;
-    /** Output file or directory, leave blank to use stdout */
-    output?: string;
-    /** Preserve options (mode, ownership, timestamps, links, all) */
-    preserve?: ('mode' | 'timestamps' | 'ownership' | 'links' | 'all')[];
-    /** Quiet mode to suppress all output */
-    quiet?: boolean;
     /** Recursively minify directories */
     recursive?: boolean;
-    /** Copy all files to destination directory and minify when filetype matches */
-    sync?: boolean;
     /** Preserve all comments in SVG */
     svgKeepComments?: boolean;
     /** Number of significant digits to preserve in numbers, 0 is all in SVG */
     svgPrecision?: number;
     /** Filetype (eg. css or text/css), optional when specifying inputs */
     type?: string;
-    /** URL of file to enable URL minification */
-    url?: string;
-    /** Verbose mode, set twice for more verbosity */
-    verbose?: number;
-    /** Watch files and minify upon changes */
-    watch?: boolean;
     /** Preserve whitespace characters but still collapse multiple into one in XML */
     xmlKeepWhitespace?: boolean;
-    /** Input files or directories, leave blank to use stdin */
-    inputs?: string[];
-    /** Data to pass directly to stdin */
-    stdin?: string;
 }
 
 /**
