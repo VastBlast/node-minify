@@ -1,4 +1,7 @@
-/node_modules
+*node_modules*
 /.vscode
 /testing
+/gonode*
+/generated-bindings/build
+/generated-bindings/prebuilds
 /dist

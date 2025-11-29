@@ -1,27 +1,47 @@
 {
   "name": "@vastblast/node-minify",
-  "version": "1.2.24.3",
+  "version": "2.0.0",
   "description": "",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "scripts": {
-    "build": "npm run clean && tsc",
-    "clean": "shx rm -rf dist"
+    "build": "tsdown",
+    "generate:bindings": "gonode clean && gonode generate",
+    "build:bindings": "cd generated-bindings && npm run build",
+    "postinstall": "npm run build:bindings",
+    "prepublish": "npm run build"
   },
   "keywords": [],
-  "author": "",
+  "author": "VastBlast",
   "license": "ISC",
+  "dependencies": {
+    "bindings": "^1.5.0",
+    "node-addon-api": "^8.5.0",
+    "node-gyp": "^12.1.0"
+  },
   "devDependencies": {
     "@types/node": "^24.5.2",
-    "@types/tar": "^6.1.13",
-    "@types/yauzl-promise": "^4.0.1",
-    "adm-zip": "^0.5.16",
-    "shx": "^0.4.0",
-    "typescript": "^5.6.3",
-    "yauzl-promise": "^4.0.0"
+    "tsdown": "^0.17.0-beta.3",
+    "typescript": "^5.6.3"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
   },
   "files": [
-    "bin/",
-    "dist/"
-  ]
+    "dist/",
+    "generated-bindings/",
+    "minify/"
+  ],
+  "type": "module"
 }
