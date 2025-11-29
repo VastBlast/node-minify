@@ -1,7 +1,7 @@
 {
   "name": "nodeminify",
   "sources": [
-    "minify.go"
+    "./minify/minify.go"
   ],
   "output": "./generated-bindings/",
   "exports": [

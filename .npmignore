@@ -1,3 +1,6 @@
 /node_modules
 /.vscode
 /testing
+/gonacli*
+/bindings/node_modules
+/bindings/build
