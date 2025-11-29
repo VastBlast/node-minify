@@ -1,6 +1,13 @@
 # @vastblast/node-minify
 
-A Node.js wrapper for the [minify](https://github.com/tdewolff/minify/) command-line tool by tdewolff. This package provides a simple and type-safe way to use the minify tool in your Node.js projects.
+Native Node bindings for the [tdewolff/minify](https://github.com/tdewolff/minify) Go minifier. Minification runs in-process via N-API, so you get the Go implementation's speed without shelling out to a CLI.
+
+## Features
+
+- Go-powered native addon; fast and no child processes.
+- Promise-based `minify(data, options)` API that returns the minified string.
+- Supports CSS, HTML, JS, JSON, SVG, XML, and import maps with the same tuning flags as the Go minifier.
+- Ships with prebuilt binaries for common platforms and falls back to a local build when needed.
 
 ## Installation
 
@@ -8,60 +15,68 @@ A Node.js wrapper for the [minify](https://github.com/tdewolff/minify/) command-
 npm install @vastblast/node-minify
 ```
 
+If your platform is not covered by the included prebuilds, make sure you have Go and the usual `node-gyp` toolchain available so the native module can compile during install.
+
 ## Usage
 
 ```typescript
 import { minify } from '@vastblast/node-minify';
 
-async function example() {
-  try {
-    // Minify CSS files
-    const result = await minify({
-      all: true,
-      cssPrecision: 2,
-      inputs: ['styles.css', 'theme.css'],
-      output: 'minified.css'
-    });
-    console.log('Minification successful:', result);
+const html = `
+<!doctype html>
+<html>
+  <head><title>Demo</title></head>
+  <body><h1>Hello, world!</h1></body>
+</html>`;
 
-    // Minify HTML using stdin
-    const htmlResult = await minify({
-      type: 'html',
-      stdin: '<html><body><h1>Hello, World!</h1></body></html>',
-      htmlKeepComments: true
-    });
-    console.log('HTML minification result:', htmlResult);
-  } catch (error) {
-    console.error('Minification failed:', error);
-  }
-}
+const minified = await minify(html, {
+  type: 'text/html',
+  htmlKeepComments: false,
+  htmlKeepWhitespace: false,
+});
 
-example();
+console.log(minified);
 ```
+
+```typescript
+const js = await minify('const sum = (a, b) => a + b;', {
+  type: 'application/javascript',
+  jsPrecision: 3,
+});
+```
+
+`minify` returns a `Promise<string>` and rejects with an `Error` if the input or options are invalid.
 
 ## API
 
-### `minify(options: MinifyOptions): Promise<string>`
+### `minify(data: string, options: MinifyOptions): Promise<string>`
 
-Minifies files or input data using the specified options.
+- `data`: the string to minify (required).
+- `options.type`: media type (required).
+- Remaining `MinifyOptions` map directly to [tdewolff/minify](https://github.com/tdewolff/minify/) flags.
 
-- `options`: An object containing the minification options. See the `MinifyOptions` interface for all available options.
-- Returns: A promise that resolves with the stdout of the minify command.
+Supported media types:
 
-## Supported Platforms
+`'text/css'`, `'text/html'`, `'image/svg+xml'`, `'application/javascript'`, `'application/json'`, `'application/rss+xml'`, `'application/manifest+json'`, `'application/xhtml-xml'`, `'text/xml'`, `'importmap'`
 
-This package includes pre-built binaries for the following platforms:
+Common options (all optional unless noted):
 
-- Windows (x64, arm64)
-- macOS (x64, arm64)
-- Linux (x64, arm64)
+- `cssPrecision`: decimal precision for CSS numbers.
+- `htmlKeepComments`, `htmlKeepDefaultAttrvals`, `htmlKeepDocumentTags`, `htmlKeepEndTags`, `htmlKeepQuotes`, `htmlKeepSpecialComments`, `htmlKeepWhitespace`: control how much HTML is preserved.
+- `jsKeepVarNames`, `jsPrecision`, `jsVersion`: adjust JS minification.
+- `jsonKeepNumbers`, `jsonPrecision`: JSON minification tuning.
+- `svgKeepComments`, `svgPrecision`: SVG-specific controls.
+- `xmlKeepWhitespace`: preserve XML whitespace.
+- `url`: base URL used by the underlying minifier.
 
-The appropriate binary will be automatically selected based on your system's platform and architecture.
+## Native bindings and performance
+
+The package embeds the Go minifier in a native N-API addon. Work happens inside the addon (no spawned processes), which keeps throughput close to the original Go project and avoids the overhead of piping data through a CLI.
 
 ## Credits
 
-This package is a wrapper for the [minify](https://github.com/tdewolff/minify/) tool by Taco de Wolff. All credit for the core minification functionality goes to the original author and contributors of that project.
+Powered by [tdewolff/minify](https://github.com/tdewolff/minify/).
 
 ## License
 
-[MIT License](LICENSE)
+MIT
