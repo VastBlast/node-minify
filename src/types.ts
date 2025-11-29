@@ -12,7 +12,6 @@ export type MinifyMediaType =
   | 'importmap';
 
 export interface MinifyOptions {
-  data?: string;
   type: MinifyMediaType;
   cssPrecision?: number;
   htmlKeepComments?: boolean;

@@ -1,0 +1,50 @@
+{
+  "name": "nodeminify",
+  "sources": [
+    "minify.go"
+  ],
+  "output": "./generated-bindings/",
+  "exports": [
+    {
+      "name": "MinifyString",
+      "args": [
+        {
+          "name": "data",
+          "type": "string",
+          "isrequire": true
+        },
+        {
+          "name": "options",
+          "type": "object",
+          "isrequire": true
+        }
+      ],
+      "returntype": "object",
+      "jscallname": "minify_string",
+      "jscallmode": "sync"
+    },
+    {
+      "name": "MinifyStringAsync",
+      "args": [
+        {
+          "name": "data",
+          "type": "string",
+          "isrequire": true
+        },
+        {
+          "name": "options",
+          "type": "object",
+          "isrequire": true
+        },
+        {
+          "name": "cb",
+          "type": "callback",
+          "isrequire": true
+        }
+      ],
+      "returntype": "object",
+      "jscallname": "minify_string_async",
+      "jscallmode": "async"
+    }
+  ]
+}

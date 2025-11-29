@@ -1,4 +1,4 @@
-import nodeminify from '../bindings';
+import nodeminify from '../generated-bindings';
 import type { MinifyOptions } from './types';
 export type * from './types';
 
