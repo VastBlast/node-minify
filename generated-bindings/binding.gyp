@@ -8,7 +8,8 @@
             "cflags_cc!": [ "-fno-exceptions" ],
             "sources": [ "nodeminify.cc" ],
             "include_dirs": [
-                "<!@(node -p \"require('node-addon-api').include\")"
+                "<!@(node -p \"require('node-addon-api').include\")",
+                "<(module_root_dir)/prebuild"
             ],
             "defines": [ "NAPI_CPP_EXCEPTIONS", "NAPI_EXPERIMENTAL" ],
             "conditions": [
@@ -17,7 +18,7 @@
                     "cflags_cc": [ "-O3", "-fdata-sections", "-ffunction-sections" ],
                     "ldflags": [ "-Wl,--gc-sections" ],
                     "libraries": [
-                        "<(module_root_dir)/nodeminify.a"
+                        "<(module_root_dir)/prebuild/nodeminify.a"
                     ]
                 }],
                 [ 'OS=="mac"', {
@@ -27,7 +28,7 @@
                         "OTHER_LDFLAGS": [ "-Wl,-dead_strip" ]
                     },
                     "libraries": [
-                        "<(module_root_dir)/nodeminify.a"
+                        "<(module_root_dir)/prebuild/nodeminify.a"
                     ]
                 }],
                 [ 'OS=="win"', {
@@ -45,21 +46,15 @@
                             "EnableCOMDATFolding": "2"
                         }
                     },
-                    "copies": [
-                        {
-                            "files": [ "<(module_root_dir)/nodeminify.dll" ],
-                            "destination": "<(PRODUCT_DIR)"
-                        }
-                    ],
                     "libraries": [
-                        "<(module_root_dir)/nodeminify.lib"
+                        "<(module_root_dir)/prebuild/nodeminify.lib"
                     ]
                 }],
                 [ 'OS!="win" and OS!="linux" and OS!="mac"', {
                     "cflags": [ "-O3" ],
                     "cflags_cc": [ "-O3" ],
                     "libraries": [
-                        "<(module_root_dir)/nodeminify.a"
+                        "<(module_root_dir)/prebuild/nodeminify.a"
                     ]
                 }]
             ]
