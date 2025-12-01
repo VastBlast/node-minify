@@ -3,20 +3,15 @@
   "version": "2.0.1",
   "description": "",
   "scripts": {
-    "build": "tsdown",
-    "generate:bindings": "gonode clean && gonode generate",
-    "build:bindings": "cd generated-bindings && npm run build",
-    "postinstall": "npm run build:bindings",
+    "build": "npm run build:go && tsdown",
+    "build:go": "node ./scripts/build-go.mjs",
+    "build:ts": "tsdown",
+    "postinstall": "npm run build:go",
     "prepublish": "npm run build"
   },
   "keywords": [],
   "author": "VastBlast",
   "license": "MIT",
-  "dependencies": {
-    "bindings": "^1.5.0",
-    "node-addon-api": "^8.5.0",
-    "node-gyp": "^12.1.0"
-  },
   "devDependencies": {
     "@types/node": "^24.5.2",
     "tsdown": "^0.17.0-beta.3",
@@ -40,8 +35,12 @@
   },
   "files": [
     "dist/",
-    "generated-bindings/",
-    "minify/"
+    "build/",
+    "minify/",
+    "scripts/"
   ],
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "koffi": "^2.14.1"
+  }
 }
