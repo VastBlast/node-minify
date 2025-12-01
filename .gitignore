@@ -1,8 +1,9 @@
 node_modules/
-/.vscode
-/testing
-/gonode*
-/dist
-/build
-/.cache
-/.gocache
+.vscode/
+testing/
+gonode*/
+dist/
+.cache/
+.gocache/
+build/
+.npmrc

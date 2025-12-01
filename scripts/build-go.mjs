@@ -20,13 +20,25 @@ const buildRoot = join(repoRoot, 'build')
 const outputDir = join(buildRoot, `${targetOs}-${targetArch}`)
 const cacheDir = process.env.GOCACHE || join(repoRoot, '.cache', `${targetOs}-${targetArch}`, 'go-build')
 
+const outputLib = join(outputDir, `nodeminify${ext}`)
+const skipBuild = process.env.NODE_MINIFY_SKIP_BUILD === '1'
+const forceBuild = process.env.NODE_MINIFY_FORCE_BUILD === '1'
+
+console.log(`Building nodeminify for ${targetOs}/${targetArch} -> ${outputLib}`)
+
+if (skipBuild) {
+  console.log('Skipping Go build because NODE_MINIFY_SKIP_BUILD=1 (ensure the library exists at the expected path)')
+  process.exit(0)
+}
+
+if (!forceBuild && existsSync(outputLib)) {
+  console.log('Prebuilt library already present; skipping Go build. Set NODE_MINIFY_FORCE_BUILD=1 to rebuild.')
+  process.exit(0)
+}
+
 ensureDir(buildRoot)
 ensureDir(outputDir)
 ensureDir(cacheDir)
-
-const outputLib = join(outputDir, `nodeminify${ext}`)
-
-console.log(`Building nodeminify for ${targetOs}/${targetArch} -> ${outputLib}`)
 
 const env = {
   ...process.env,

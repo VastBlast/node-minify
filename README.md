@@ -17,6 +17,13 @@ npm install @vastblast/node-minify
 
 The install step builds a small Go shared library for your host platform. Ensure Go is available in `PATH` (or set `GOOS/GOARCH` to cross-compile). You can also point to a prebuilt library by setting `NODE_MINIFY_LIB_PATH`.
 
+### Shipping/using prebuilts
+
+- Run `GOOS=<target> GOARCH=<target> npm run build:go` to emit `build/<goos>-<goarch>/nodeminify.<ext>`.
+- Keep `build/` in your npm package so installs on those platforms can reuse the prebuilt.
+- `postinstall` skips building when a matching prebuilt exists. Set `NODE_MINIFY_FORCE_BUILD=1` to rebuild or `NODE_MINIFY_SKIP_BUILD=1` to skip entirely (useful with `NODE_MINIFY_LIB_PATH`).
+- CI workflow `.github/workflows/prebuilds.yml` builds prebuilts per platform and can publish to npm when a `NPM_TOKEN` secret is configured and `publish=true` is passed on `workflow_dispatch`.
+
 ## Usage
 
 ```typescript

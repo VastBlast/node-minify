@@ -1,0 +1,102 @@
+name: Prebuild and Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Publish to npm after assembling prebuilts'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: read
+
+jobs:
+  prebuilds:
+    name: Build Go (${{ matrix.goos }}/${{ matrix.goarch }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            goos: linux
+            goarch: amd64
+          - os: ubuntu-latest
+            goos: linux
+            goarch: arm64
+            cc: aarch64-linux-gnu-gcc
+          - os: macos-latest
+            goos: darwin
+            goarch: arm64
+          - os: windows-latest
+            goos: windows
+            goarch: amd64
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: minify/go.mod
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install cross compiler (linux/arm64)
+        if: matrix.cc == 'aarch64-linux-gnu-gcc'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Go library
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: 1
+          CC: ${{ matrix.cc || '' }}
+          NODE_MINIFY_FORCE_BUILD: 1
+        run: npm run build:go
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: |
+            build/${{ matrix.goos }}-${{ matrix.goarch }}/**
+          if-no-files-found: error
+
+  package:
+    name: Assemble and (optionally) publish
+    needs: prebuilds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Download prebuilts
+        uses: actions/download-artifact@v4
+        with:
+          path: build
+          merge-multiple: true
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build TypeScript artifacts
+        run: npm run build:ts
+
+      - name: Publish to npm
+        if: inputs.publish == 'true'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish
