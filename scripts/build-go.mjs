@@ -1,5 +1,5 @@
 import { spawnSync } from 'child_process'
-import { copyFileSync, existsSync, mkdirSync } from 'fs'
+import { existsSync, mkdirSync } from 'fs'
 import { dirname, join } from 'path'
 import { fileURLToPath } from 'url'
 
@@ -43,16 +43,6 @@ const result = spawnSync('go', ['build', '-buildmode=c-shared', '-o', outputLib,
 
 if (result.status !== 0) {
   process.exit(result.status ?? 1)
-}
-
-if (targetOs === hostOs && targetArch === hostArch) {
-  const flatLib = join(buildRoot, `nodeminify${ext}`)
-  copyFileSync(outputLib, flatLib)
-
-  const header = join(outputDir, 'nodeminify.h')
-  if (existsSync(header)) {
-    copyFileSync(header, join(buildRoot, 'nodeminify.h'))
-  }
 }
 
 function ensureDir(pathname) {

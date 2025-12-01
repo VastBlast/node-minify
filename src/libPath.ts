@@ -12,10 +12,7 @@ export function resolveLibPath(extension: string): string {
   }
 
   const goPlatformDir = `${toGoOS(process.platform)}-${toGoArch(process.arch)}`
-  const candidates = [
-    path.resolve(__dirname, '..', 'build', `nodeminify${extension}`),
-    path.resolve(__dirname, '..', 'build', goPlatformDir, `nodeminify${extension}`)
-  ]
+  const candidates = [path.resolve(__dirname, '..', 'build', goPlatformDir, `nodeminify${extension}`)]
 
   for (const candidate of candidates) {
     if (fs.existsSync(candidate)) return candidate
