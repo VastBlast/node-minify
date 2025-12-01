@@ -9,7 +9,7 @@ const fs = require('fs');
 const config = {
   name: "nodeminify",
   sources: ["minify.go"],
-  exports: ["MinifyString","MinifyStringAsync"],
+  exports: ["MinifyString","MinifyStringAsync","FreeCString"],
 };
 
 const rootDir = __dirname;
@@ -71,6 +71,49 @@ function tryRun(cmd, args) {
   return { ok: true, missing: false };
 }
 
+function hasUserFreeCString(sourcePaths, root) {
+  for (const src of sourcePaths) {
+    const full = path.isAbsolute(src) ? src : join(root, src);
+    try {
+      const content = fs.readFileSync(full, 'utf8');
+      if (content.includes('FreeCString')) {
+        return true;
+      }
+    } catch {
+      continue;
+    }
+  }
+  return false;
+}
+
+function ensureTempFreeCStringFile(root) {
+  const firstSrc = path.isAbsolute(config.sources[0]) ? config.sources[0] : join(root, config.sources[0]);
+  const sourceDir = path.dirname(firstSrc);
+  const tempPath = join(sourceDir, 'temp_gonode_helpers.go');
+  if (fs.existsSync(tempPath)) {
+    return { path: tempPath, created: false };
+  }
+  if (hasUserFreeCString(config.sources, root)) {
+    return { path: '', created: false };
+  }
+  const pkg = 'main';
+  const contents = [
+    'package ' + pkg,
+    '',
+    '// #include <stdlib.h>',
+    'import "C"',
+    'import "unsafe"',
+    '',
+    '//export FreeCString',
+    'func FreeCString(str *C.char) {',
+    '\tC.free(unsafe.Pointer(str))',
+    '}',
+    '',
+  ].join('\n');
+  fs.writeFileSync(tempPath, contents, 'utf8');
+  return { path: tempPath, created: true };
+}
+
 function buildGo() {
   console.log('Building Go c-archive ...');
   const goCheck = tryRun(goCmd, ['version']);
@@ -93,23 +136,47 @@ function buildGo() {
     throw new Error('Go sources are missing from this package. Ensure the following files are published: ' + missingSources.join(', '));
   }
 
-  const args = ['build', '-buildmode=c-archive', '-o', join(buildDir, config.name + '.a')];
+  const goBuildArgs = (process.env.GO_BUILD_ARGS || '').trim().split(/\s+/).filter(Boolean);
+  const args = ['build', '-buildmode=c-archive', ...goBuildArgs, '-o', join(buildDir, config.name + '.a')];
   for (const src of config.sources) {
     args.push(join(workDir, src));
   }
-  const result = spawnSync(goCmd, args, { cwd: workDir, stdio: 'inherit' });
-  if (result.error) {
-    const err = new Error('Failed to run Go build. ' + (result.error.message || String(result.error)) + ' (cwd=' + workDir + ')');
-    err.code = typeof result.error.code === 'number' ? result.error.code : 1;
-    err.errno = typeof result.error.code === 'string' ? result.error.code : undefined;
-    throw err;
+  const tempFree = ensureTempFreeCStringFile(workDir);
+  if (tempFree.path) {
+    args.push(tempFree.path);
   }
-  if (result.status !== 0) {
-    const statusCode = typeof result.status === 'number' ? result.status : 1;
-    const err = new Error('go build -buildmode=c-archive failed with code ' + statusCode);
-    err.code = statusCode;
-    err.status = statusCode;
-    throw err;
+  let buildOk = false;
+  try {
+    const result = spawnSync(goCmd, args, { cwd: workDir, stdio: 'inherit' });
+    if (result.error) {
+      const err = new Error('Failed to run Go build. ' + (result.error.message || String(result.error)) + ' (cwd=' + workDir + ')');
+      err.code = typeof result.error.code === 'number' ? result.error.code : 1;
+      err.errno = typeof result.error.code === 'string' ? result.error.code : undefined;
+      throw err;
+    }
+    if (result.status !== 0) {
+      const statusCode = typeof result.status === 'number' ? result.status : 1;
+      const err = new Error('go build -buildmode=c-archive failed with code ' + statusCode);
+      err.code = statusCode;
+      err.status = statusCode;
+      throw err;
+    }
+    buildOk = true;
+  } finally {
+    if (tempFree.created && tempFree.path && fs.existsSync(tempFree.path)) {
+      try {
+        fs.unlinkSync(tempFree.path);
+      } catch {
+        // best effort
+      }
+    }
+    if (!buildOk) {
+      try {
+        fs.rmSync(buildDir, { recursive: true, force: true });
+      } catch {
+        // best effort
+      }
+    }
   }
 }
 

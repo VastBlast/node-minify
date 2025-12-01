@@ -4,9 +4,9 @@ export type * from './types';
 
 export function minify(data: string, opts: MinifyOptions): Promise<any> {
     return new Promise((resolve, reject) => {
-        nodeminify.minifyStringAsync(data, opts, (res: any) => {
-            if (res.error) {
-                reject(new Error(res.error));
+        nodeminify.minifyStringAsync(data, opts, (error: any, res: any) => {
+            if (error || res.error) {
+                reject(new Error(error || res.error));
             } else {
                 resolve(res.data);
             }

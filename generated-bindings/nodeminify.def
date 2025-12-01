@@ -1,3 +1,4 @@
 EXPORTS
   MinifyString
   MinifyStringAsync
+  FreeCString

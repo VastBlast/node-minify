@@ -5,3 +5,4 @@
 /generated-bindings/build
 /generated-bindings/prebuilds
 /dist
+/.gocache
