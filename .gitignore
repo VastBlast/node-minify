@@ -1,8 +1,9 @@
-*node_modules*
-/.vscode
-/testing
-/gonode*
-/generated-bindings/build
-/generated-bindings/prebuilds
-/dist
-/.gocache
+node_modules/
+.vscode/
+testing/
+gonode*/
+dist/
+.cache/
+.gocache/
+build/
+.npmrc

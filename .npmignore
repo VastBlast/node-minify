@@ -1,5 +1,8 @@
-*node_modules*
-/.vscode
-/testing
-/gonode*
-/generated-bindings/build
+node_modules/
+.vscode/
+testing/
+gonode*/
+.cache/
+.gocache/
+# Keep build/ in the published package for prebuilts
+dist/

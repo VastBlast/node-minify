@@ -1,13 +1,13 @@
 # @vastblast/node-minify
 
-Native Node bindings for the [tdewolff/minify](https://github.com/tdewolff/minify) Go minifier. Minification runs in-process via N-API, so you get the Go implementation's speed without shelling out to a CLI.
+Native bindings for the [tdewolff/minify](https://github.com/tdewolff/minify) Go minifier powered by [koffi](https://github.com/Koromix/rygel). Minification runs in-process against a Go-built shared library, so you get the Go implementation's speed without shelling out to a CLI.
 
 ## Features
 
-- Go-powered native addon; fast and no child processes.
+- Go-powered minifier loaded through koffi; no child processes.
 - Promise-based `minify(data, options)` API that returns the minified string.
 - Supports CSS, HTML, JS, JSON, SVG, XML, and import maps with the same tuning flags as the Go minifier.
-- Ships with prebuilt binaries for common platforms and falls back to a local build when needed.
+- Cross-compile the Go shared library with `GOOS/GOARCH` or point to a custom build via `NODE_MINIFY_LIB_PATH`.
 
 ## Installation
 
@@ -15,7 +15,14 @@ Native Node bindings for the [tdewolff/minify](https://github.com/tdewolff/minif
 npm install @vastblast/node-minify
 ```
 
-If your platform is not covered by the included prebuilds, make sure you have Go and the usual `node-gyp` toolchain available so the native module can compile during install.
+The install step builds a small Go shared library for your host platform. Ensure Go is available in `PATH` (or set `GOOS/GOARCH` to cross-compile). You can also point to a prebuilt library by setting `NODE_MINIFY_LIB_PATH`.
+
+### Shipping/using prebuilts
+
+- Run `GOOS=<target> GOARCH=<target> npm run build:go` to emit `build/<goos>-<goarch>/nodeminify.<ext>`.
+- Keep `build/` in your npm package so installs on those platforms can reuse the prebuilt.
+- `postinstall` skips building when a matching prebuilt exists. Set `NODE_MINIFY_FORCE_BUILD=1` to rebuild or `NODE_MINIFY_SKIP_BUILD=1` to skip entirely (useful with `NODE_MINIFY_LIB_PATH`).
+- CI workflow `.github/workflows/prebuilds.yml` builds prebuilts per platform and can publish to npm when a `NPM_TOKEN` secret is configured and `publish=true` is passed on `workflow_dispatch`.
 
 ## Usage
 
@@ -71,7 +78,7 @@ Common options (all optional unless noted):
 
 ## Native bindings and performance
 
-The package embeds the Go minifier in a native N-API addon. Work happens inside the addon (no spawned processes), which keeps throughput close to the original Go project and avoids the overhead of piping data through a CLI.
+The package loads a Go-built shared library via koffi. All work happens inside that library (no spawned processes), keeping throughput close to the original Go project and avoiding CLI overhead.
 
 ## Credits
 

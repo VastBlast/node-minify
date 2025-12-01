@@ -2,6 +2,7 @@ package main
 
 /*
 #include <string.h>
+#include <stdlib.h>
 */
 import "C"
 import (
@@ -276,6 +277,13 @@ func MinifyString(cData *C.char, cOptionsJson *C.char) *C.char {
 func MinifyStringAsync(cData *C.char, cOptionsJson *C.char, cb *C.char) *C.char {
 	result := MinifyString(cData, cOptionsJson)
 	return result
+}
+
+//export FreeCString
+func FreeCString(ptr unsafe.Pointer) {
+	if ptr != nil {
+		C.free(ptr)
+	}
 }
 
 func main() {}
