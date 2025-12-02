@@ -1,6 +1,6 @@
 # @vastblast/node-minify
 
-Native bindings for the [tdewolff/minify](https://github.com/tdewolff/minify) Go minifier powered by [koffi](https://github.com/Koromix/rygel). Minification runs in-process against a Go-built shared library, so you get the Go implementation's speed without shelling out to a CLI.
+Native bindings for the [tdewolff/minify](https://github.com/tdewolff/minify) Go minifier powered by [koffi](https://github.com/Koromix/koffi). Minification runs in-process against a Go-built shared library, so you get the Go implementation's speed without shelling out to a CLI.
 
 ## Features
 
@@ -19,10 +19,10 @@ The install step builds a small Go shared library for your host platform. Ensure
 
 ### Shipping/using prebuilts
 
-- Run `GOOS=<target> GOARCH=<target> npm run build:go` to emit `build/<goos>-<goarch>/nodeminify.<ext>`.
+- Run `GOOS=<target> GOARCH=<target> npm run build:go` (or `npm run build:go -- --goos <target> --goarch <target>`) to emit `build/<goos>-<goarch>/nodeminify.<ext>`.
 - Keep `build/` in your npm package so installs on those platforms can reuse the prebuilt.
-- `postinstall` skips building when a matching prebuilt exists. Set `NODE_MINIFY_FORCE_BUILD=1` to rebuild or `NODE_MINIFY_SKIP_BUILD=1` to skip entirely (useful with `NODE_MINIFY_LIB_PATH`).
-- CI workflow `.github/workflows/prebuilds.yml` builds prebuilts per platform and can publish to npm when a `NPM_TOKEN` secret is configured and `publish=true` is passed on `workflow_dispatch`.
+- `postinstall` skips building when a matching prebuilt exists. Set `NODE_MINIFY_FORCE_BUILD=1`/`NODE_MINIFY_SKIP_BUILD=1` (or pass `--force-build`/`--skip-build`) to override; use `NODE_MINIFY_DEBUG_BUILD=1` or `--debug-build` to keep symbols for native debugging.
+- CI workflow `.github/workflows/prebuilds.yml` builds prebuilts per platform and publishes when `publish=true` on `workflow_dispatch`. Publishing expects the package to be set up as an npm trusted publisher (OIDC/id-token) or for an automation token to be provided via `NODE_AUTH_TOKEN`.
 
 ## Usage
 
