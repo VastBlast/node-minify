@@ -6,11 +6,16 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
+const cliArgs = process.argv.slice(2)
+
 const hostOs = toGoOS(process.platform)
 const hostArch = toGoArch(process.arch)
 
-const targetOs = process.env.GOOS || hostOs
-const targetArch = process.env.GOARCH || hostArch
+const rawTargetOs = getArgValue('goos') || process.env.GOOS
+const rawTargetArch = getArgValue('goarch') || process.env.GOARCH
+
+const targetOs = rawTargetOs ? toGoOS(rawTargetOs) : hostOs
+const targetArch = rawTargetArch ? toGoArch(rawTargetArch) : hostArch
 
 const ext = getExt(targetOs)
 
@@ -21,24 +26,35 @@ const outputDir = join(buildRoot, `${targetOs}-${targetArch}`)
 const cacheDir = process.env.GOCACHE || join(repoRoot, '.cache', `${targetOs}-${targetArch}`, 'go-build')
 
 const outputLib = join(outputDir, `nodeminify${ext}`)
-const skipBuild = process.env.NODE_MINIFY_SKIP_BUILD === '1'
-const forceBuild = process.env.NODE_MINIFY_FORCE_BUILD === '1'
+const skipBuild = process.env.NODE_MINIFY_SKIP_BUILD === '1' || hasArg('skip-build')
+const forceBuild = process.env.NODE_MINIFY_FORCE_BUILD === '1' || hasArg('force-build')
+const isDebugBuild = process.env.NODE_MINIFY_DEBUG_BUILD === '1' || hasArg('debug-build')
 
 console.log(`Building nodeminify for ${targetOs}/${targetArch} -> ${outputLib}`)
 
 if (skipBuild) {
-  console.log('Skipping Go build because NODE_MINIFY_SKIP_BUILD=1 (ensure the library exists at the expected path)')
+  console.log('Skipping Go build because NODE_MINIFY_SKIP_BUILD=1 or --skip-build was provided (ensure the library exists at the expected path)')
   process.exit(0)
 }
 
 if (!forceBuild && existsSync(outputLib)) {
-  console.log('Prebuilt library already present; skipping Go build. Set NODE_MINIFY_FORCE_BUILD=1 to rebuild.')
+  console.log('Prebuilt library already present; skipping Go build. Set NODE_MINIFY_FORCE_BUILD=1 or pass --force-build to rebuild.')
   process.exit(0)
 }
 
 ensureDir(buildRoot)
 ensureDir(outputDir)
 ensureDir(cacheDir)
+
+const goArgs = ['build', '-buildmode=c-shared', '-o', outputLib]
+
+if (!isDebugBuild) {
+  goArgs.push('-trimpath', '-ldflags=-s -w', '-buildvcs=false')
+} else {
+  console.log('Debug build requested (--debug-build or NODE_MINIFY_DEBUG_BUILD=1); skipping production strip flags.')
+}
+
+goArgs.push('.')
 
 const env = {
   ...process.env,
@@ -47,7 +63,7 @@ const env = {
   GOCACHE: cacheDir
 }
 
-const result = spawnSync('go', ['build', '-buildmode=c-shared', '-o', outputLib, '.'], {
+const result = spawnSync('go', goArgs, {
   cwd: goRoot,
   env,
   stdio: 'inherit'
@@ -61,6 +77,26 @@ function ensureDir(pathname) {
   if (!existsSync(pathname)) {
     mkdirSync(pathname, { recursive: true })
   }
+}
+
+function hasArg(name) {
+  return cliArgs.some(arg => arg === `--${name}`)
+}
+
+function getArgValue(name) {
+  for (let i = 0; i < cliArgs.length; i++) {
+    const arg = cliArgs[i]
+    if (arg === `--${name}`) {
+      const next = cliArgs[i + 1]
+      if (next && !next.startsWith('-')) {
+        return next
+      }
+    }
+    if (arg.startsWith(`--${name}=`)) {
+      return arg.slice(name.length + 3)
+    }
+  }
+  return undefined
 }
 
 function toGoOS(platform) {
