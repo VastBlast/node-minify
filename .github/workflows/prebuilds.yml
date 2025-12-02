@@ -6,7 +6,7 @@ on:
       publish:
         description: 'Publish to npm after assembling prebuilts'
         required: false
-        default: 'false'
+        default: 'true'
 
 permissions:
   contents: read
