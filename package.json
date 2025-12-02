@@ -42,5 +42,9 @@
   "type": "module",
   "dependencies": {
     "koffi": "^2.14.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VastBlast/node-minify.git"
   }
 }
