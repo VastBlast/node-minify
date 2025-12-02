@@ -71,8 +71,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-${{ matrix.goos }}-${{ matrix.goarch }}
-          path: |
-            build/${{ matrix.goos }}-${{ matrix.goarch }}/**
+          path: build/**
           if-no-files-found: error
 
   package:
