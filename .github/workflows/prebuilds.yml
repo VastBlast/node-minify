@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   prebuilds:
@@ -84,6 +85,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
           cache: 'npm'
 
       - name: Download prebuilts
@@ -102,5 +104,5 @@ jobs:
         if: inputs.publish == 'true'
         env:
           NPM_CONFIG_PROVENANCE: 'true'
-          NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
+          NPM_CONFIG_REGISTRY: https://registry.npmjs.org
         run: npm publish --provenance --access public
