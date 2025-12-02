@@ -100,4 +100,7 @@ jobs:
 
       - name: Publish to npm
         if: inputs.publish == 'true'
-        run: npm publish
+        env:
+          NPM_CONFIG_PROVENANCE: 'true'
+          NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
+        run: npm publish --provenance --access public
