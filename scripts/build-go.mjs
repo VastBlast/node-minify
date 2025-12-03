@@ -3,6 +3,8 @@ import { existsSync, mkdirSync } from 'fs'
 import { dirname, join } from 'path'
 import { fileURLToPath } from 'url'
 
+if (typeof Bun !== "undefined") console.log(`Running build script with Bun`);
+
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
