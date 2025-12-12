@@ -1,3 +1,7 @@
+# Depreciated, [use minify](https://github.com/tdewolff/minify/tree/master/bindings/js)
+
+This was a proof-of-concept module which has been written for [tdewolff/minify](https://github.com/tdewolff/minify/tree/master/bindings/js). My PR based on this was successfully merged and an NPM package has been published at `@tdewolff/minify` so all maintenance will be done there.
+
 # @vastblast/node-minify
 
 Native bindings for the [tdewolff/minify](https://github.com/tdewolff/minify) Go minifier powered by [koffi](https://github.com/Koromix/koffi). Minification runs in-process against a Go-built shared library, so you get the Go implementation's speed without shelling out to a CLI.
